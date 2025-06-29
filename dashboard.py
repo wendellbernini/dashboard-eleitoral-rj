@@ -6,8 +6,8 @@ import requests
 import unicodedata
 
 # --- Configuração da Página ---
-# Esta é a instrução mais importante e deve ser a primeira do código.
-# O 'page_title' aqui é o que será usado como título na pré-visualização.
+# Esta é a única instrução que pode influenciar a pré-visualização.
+# Ela deve ser o PRIMEIRO comando do Streamlit no script.
 st.set_page_config(
     page_title="Painel Estratégico | Gabinete Índia Armelau",
     page_icon="📈",
