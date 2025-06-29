@@ -19,8 +19,8 @@ st.markdown("""
         <!-- Meta Tags para Pré-visualização em Redes Sociais (Open Graph) -->
         <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
         <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
-        <meta property="og:image" content="URL_DA_IMAGEM_DE_PREVIEW_AQUI">
-        <meta property="og:url" content="URL_DO_SEU_DASHBOARD_AQUI">
+        <meta property="og:image" content="https://imgur.com/a/Rsjvxh3">
+        <meta property="og:url" content="https://painel-india-armelau.streamlit.app">
         <meta name="twitter:card" content="summary_large_image">
     </head>
     <style>
