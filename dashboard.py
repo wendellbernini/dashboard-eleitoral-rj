@@ -18,9 +18,9 @@ st.markdown("""
         <!-- Meta Tags para Pré-visualização em Redes Sociais (Open Graph) -->
         <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
         <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
-        <!-- CORREÇÃO: Link direto para a imagem .jpeg -->
-        <meta property="og:image" content="https://github.com/wendellbernini/dashboard-eleitoral-rj/blob/main/preview.jpeg?raw=true">
-        <meta property="og:url" content="https://painel-india-armelau.streamlit.app">
+        <!-- CORREÇÃO DEFINITIVA: Usando um link de CDN otimizado para a imagem -->
+        <meta property="og:image" content="https://cdn.jsdelivr.net/gh/wendellbernini/dashboard-eleitoral-rj@main/preview.jpeg">
+        <meta property="og:url" content="https://painel-india-armelau.onrender.com">
         <meta name="twitter:card" content="summary_large_image">
     </head>
     <style>
@@ -31,6 +31,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# (O resto do código permanece o mesmo)
 # --- Funções de Apoio ---
 def normalize_text(text):
     if not isinstance(text, str): return ''
