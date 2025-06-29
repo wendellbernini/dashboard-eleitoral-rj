@@ -6,23 +6,17 @@ import requests
 import unicodedata
 
 # --- Configuração da Página ---
-# Esta deve ser a PRIMEIRA chamada do Streamlit no seu código.
+# Esta é a instrução mais importante e deve ser a primeira do código.
+# O 'page_title' aqui é o que será usado como título na pré-visualização.
 st.set_page_config(
     page_title="Painel Estratégico | Gabinete Índia Armelau",
     page_icon="📈",
     layout="wide",
 )
 
-# --- Customização da Aparência e Metadados ---
-# Injeta HTML no <head> da página para controle total da pré-visualização.
+# --- Ocultar Elementos da Interface ---
+# Este CSS continua sendo útil para limpar a aparência da página.
 st.markdown("""
-    <head>
-        <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
-        <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
-        <meta property="og:image" content="https://cdn.jsdelivr.net/gh/wendellbernini/dashboard-eleitoral-rj@main/preview.jpeg">
-        <meta property="og:url" content="https://painel-india-armelau.onrender.com">
-        <meta name="twitter:card" content="summary_large_image">
-    </head>
     <style>
         header, footer {visibility: hidden !important;}
         #MainMenu {visibility: hidden !important;}
@@ -30,7 +24,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ... (o resto do seu código funcional permanece exatamente o mesmo) ...
+# (O resto do seu código funcional permanece exatamente o mesmo)
 
 # --- Funções de Apoio ---
 def normalize_text(text):
