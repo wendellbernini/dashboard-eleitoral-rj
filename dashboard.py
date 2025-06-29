@@ -5,34 +5,31 @@ import os
 import requests
 import unicodedata
 
-# --- MELHORIA 1: CUSTOMIZAÇÃO DE METADADOS E ÍCONE ---
+# --- Configuração da Página ---
 st.set_page_config(
     page_title="Painel Estratégico | Gabinete Índia Armelau",
-    page_icon="📈", # Você pode usar um emoji ou o URL de uma imagem .ico/.png
+    page_icon="📈",
     layout="wide",
 )
 
-# --- MELHORIA 2: OCULTAR ELEMENTOS DA INTERFACE DO STREAMLIT ---
-# Injeta HTML e CSS para customizar a página
+# --- Customização da Aparência e Metadados ---
 st.markdown("""
     <head>
         <!-- Meta Tags para Pré-visualização em Redes Sociais (Open Graph) -->
         <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
         <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
-        <meta property="og:image" content="https://imgur.com/a/Rsjvxh3">
+        <!-- CORREÇÃO: Link direto para a imagem .jpeg -->
+        <meta property="og:image" content="https://i.imgur.com/sS4wVv2.jpeg">
         <meta property="og:url" content="https://painel-india-armelau.streamlit.app">
         <meta name="twitter:card" content="summary_large_image">
     </head>
     <style>
-        /* Oculta o cabeçalho principal e o rodapé do Streamlit */
+        /* Oculta elementos da interface do Streamlit para uma aparência limpa */
         header, footer {visibility: hidden !important;}
-        /* Oculta o menu "hambúrguer" no canto superior direito */
         #MainMenu {visibility: hidden !important;}
-        /* Oculta a decoração/branding no rodapé */
         div[data-testid="stDecoration"] {visibility: hidden !important;}
     </style>
 """, unsafe_allow_html=True)
-
 
 # --- Funções de Apoio ---
 def normalize_text(text):
