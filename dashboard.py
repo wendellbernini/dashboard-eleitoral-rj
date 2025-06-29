@@ -6,8 +6,6 @@ import requests
 import unicodedata
 
 # --- Configuração da Página ---
-# Esta é a única instrução que pode influenciar a pré-visualização.
-# Ela deve ser o PRIMEIRO comando do Streamlit no script.
 st.set_page_config(
     page_title="Painel Estratégico | Gabinete Índia Armelau",
     page_icon="📈",
@@ -15,7 +13,6 @@ st.set_page_config(
 )
 
 # --- Ocultar Elementos da Interface ---
-# Este CSS continua sendo útil para limpar a aparência da página.
 st.markdown("""
     <style>
         header, footer {visibility: hidden !important;}
@@ -23,8 +20,6 @@ st.markdown("""
         div[data-testid="stDecoration"] {visibility: hidden !important;}
     </style>
 """, unsafe_allow_html=True)
-
-# (O resto do seu código funcional permanece exatamente o mesmo)
 
 # --- Funções de Apoio ---
 def normalize_text(text):
@@ -77,31 +72,43 @@ col2.metric("Projeção Total 2026", f"{total_votos_2026:,.0f}".replace(",", "."
 col3.metric("Crescimento Consolidado", f"{crescimento_consolidado:,.0f}".replace(",", "."))
 st.divider()
 
-# --- MAPA INTERATIVO ---
+# --- MAPA INTERATIVO E DINÂMICO ---
 st.subheader("Análise Geográfica da Projeção")
+
+# <<< MELHORIA: Menu de seleção para a métrica do mapa >>>
+map_metric_options = {
+    'Crescimento (%)': 'Crescimento_Percentual',
+    'Votos (Projeção 2026)': 'Votos_2026',
+    'Votos (2022)': 'Votos_2022',
+    'Crescimento (Absoluto)': 'Crescimento_Votos'
+}
+selected_metric_label = st.selectbox("Visualizar mapa por:", list(map_metric_options.keys()))
+selected_metric_col = map_metric_options[selected_metric_label]
+
 filtro_mapa_cabos = st.checkbox("Destacar no mapa apenas municípios com Cabo Eleitoral")
 df_mapa = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')] if filtro_mapa_cabos else df
+
 if geojson:
     fig_map = px.choropleth_mapbox(
-        df_mapa, geojson=geojson, locations='Municipio_ID', featureidkey="properties.id",
-        color='Crescimento_Percentual', color_continuous_scale="RdYlGn", range_color=(-50, 50),
-        mapbox_style="carto-positron", zoom=7.5, center={"lat": -22.25, "lon": -42.70}, opacity=0.6,
+        df_mapa,
+        geojson=geojson,
+        locations='Municipio_ID',
+        featureidkey="properties.id",
+        color=selected_metric_col, # Cor dinâmica baseada na seleção
+        color_continuous_scale="Viridis", # Uma escala de cores neutra
+        mapbox_style="carto-positron",
+        zoom=7.5, center={"lat": -22.25, "lon": -42.70}, opacity=0.6,
         hover_name='Municipio',
         custom_data=['Votos_2022', 'Votos_2026', 'Crescimento_Votos', 'Crescimento_Percentual', 'Cabo_Eleitoral']
     )
     fig_map.update_traces(hovertemplate="<br>".join([
-        "<b>%{hovertext}</b>",
-        "Cabo Eleitoral: %{customdata[4]}",
-        "Votos 2022: %{customdata[0]:,}",
-        "Projeção 2026: %{customdata[1]:,}",
-        "Crescimento (Absoluto): %{customdata[2]:,}",
-        "Crescimento (%): %{customdata[3]:.2f}%",
+        "<b>%{hovertext}</b>", "Cabo Eleitoral: %{customdata[4]}", "Votos 2022: %{customdata[0]:,}", "Projeção 2026: %{customdata[1]:,}", "Crescimento (Absoluto): %{customdata[2]:,}", "Crescimento (%): %{customdata[3]:.2f}%"
     ]))
-    fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, coloraxis_colorbar=dict(title=selected_metric_label))
     st.plotly_chart(fig_map, use_container_width=True)
 st.divider()
 
-# --- Destaques e Gráficos ---
+# --- Destaques, Gráficos e Tabela (sem alterações) ---
 st.subheader("Destaques da Projeção")
 col1, col2 = st.columns(2)
 with col1:
@@ -123,7 +130,6 @@ fig.update_layout(legend_title_text='Eleição', xaxis_title="Município", yaxis
 st.plotly_chart(fig, use_container_width=True)
 st.divider()
 
-# --- Tabela Detalhada Final ---
 st.subheader("Análise Detalhada por Município")
 filtro_tabela_cabos = st.checkbox("Mostrar na tabela apenas municípios com Cabo Eleitoral")
 df_tabela = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')] if filtro_tabela_cabos else df
