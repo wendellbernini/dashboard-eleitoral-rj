@@ -19,7 +19,7 @@ st.markdown("""
         <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
         <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
         <!-- CORREÇÃO: Link direto para a imagem .jpeg -->
-        <meta property="og:image" content="https://i.imgur.com/sS4wVv2.jpeg">
+        <meta property="og:image" content="https://github.com/wendellbernini/dashboard-eleitoral-rj/blob/main/preview.jpeg?raw=true">
         <meta property="og:url" content="https://painel-india-armelau.streamlit.app">
         <meta name="twitter:card" content="summary_large_image">
     </head>
