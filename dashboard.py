@@ -5,22 +5,34 @@ import os
 import requests
 import unicodedata
 
-# --- Configuração da Página ---
+# --- MELHORIA 1: CUSTOMIZAÇÃO DE METADADOS E ÍCONE ---
 st.set_page_config(
-    page_title="Dashboard Eleitoral RJ",
+    page_title="Painel Estratégico | Gabinete Índia Armelau",
+    page_icon="📈", # Você pode usar um emoji ou o URL de uma imagem .ico/.png
     layout="wide",
 )
 
-# <<< MELHORIA FINAL: Ocultar elementos da interface do Streamlit >>>
-# Este bloco de CSS irá esconder o menu, o rodapé e o cabeçalho do Streamlit
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+# --- MELHORIA 2: OCULTAR ELEMENTOS DA INTERFACE DO STREAMLIT ---
+# Injeta HTML e CSS para customizar a página
+st.markdown("""
+    <head>
+        <!-- Meta Tags para Pré-visualização em Redes Sociais (Open Graph) -->
+        <meta property="og:title" content="Painel Estratégico | Gabinete Índia Armelau">
+        <meta property="og:description" content="Plataforma de análise de dados para projeções e estratégia da campanha eleitoral de 2026.">
+        <meta property="og:image" content="URL_DA_IMAGEM_DE_PREVIEW_AQUI">
+        <meta property="og:url" content="URL_DO_SEU_DASHBOARD_AQUI">
+        <meta name="twitter:card" content="summary_large_image">
+    </head>
+    <style>
+        /* Oculta o cabeçalho principal e o rodapé do Streamlit */
+        header, footer {visibility: hidden !important;}
+        /* Oculta o menu "hambúrguer" no canto superior direito */
+        #MainMenu {visibility: hidden !important;}
+        /* Oculta a decoração/branding no rodapé */
+        div[data-testid="stDecoration"] {visibility: hidden !important;}
+    </style>
+""", unsafe_allow_html=True)
+
 
 # --- Funções de Apoio ---
 def normalize_text(text):
@@ -29,12 +41,10 @@ def normalize_text(text):
 
 @st.cache_data
 def carregar_dados_projecao():
-    """Lê o arquivo Excel com os dados de projeção final."""
     arquivo_base = 'base_de_dados_eleitoral.xlsx'
     if not os.path.exists(arquivo_base):
         st.error(f"Arquivo '{arquivo_base}' não encontrado! Execute 'gerar_simulacao.py' primeiro.")
         st.stop()
-    
     df = pd.read_excel(arquivo_base)
     for col in ['Votos_2022', 'Votos_2026']:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
@@ -44,7 +54,6 @@ def carregar_dados_projecao():
 
 @st.cache_data
 def carregar_geojson():
-    """Baixa o GeoJSON e adiciona uma propriedade de ID normalizada."""
     url = "https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-33-mun.json"
     try:
         geojson_data = requests.get(url).json()
@@ -80,31 +89,22 @@ st.divider()
 st.subheader("Análise Geográfica da Projeção")
 filtro_mapa_cabos = st.checkbox("Destacar no mapa apenas municípios com Cabo Eleitoral")
 df_mapa = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')] if filtro_mapa_cabos else df
-
 if geojson:
     fig_map = px.choropleth_mapbox(
-        df_mapa,
-        geojson=geojson,
-        locations='Municipio_ID',
-        featureidkey="properties.id",
-        color='Crescimento_Percentual',
-        color_continuous_scale="RdYlGn",
-        range_color=(-50, 50),
-        mapbox_style="carto-positron",
-        zoom=7.5, center={"lat": -22.25, "lon": -42.70}, opacity=0.6,
+        df_mapa, geojson=geojson, locations='Municipio_ID', featureidkey="properties.id",
+        color='Crescimento_Percentual', color_continuous_scale="RdYlGn", range_color=(-50, 50),
+        mapbox_style="carto-positron", zoom=7.5, center={"lat": -22.25, "lon": -42.70}, opacity=0.6,
         hover_name='Municipio',
         custom_data=['Votos_2022', 'Votos_2026', 'Crescimento_Votos', 'Crescimento_Percentual', 'Cabo_Eleitoral']
     )
-    fig_map.update_traces(
-        hovertemplate="<br>".join([
-            "<b>%{hovertext}</b>",
-            "Cabo Eleitoral: %{customdata[4]}",
-            "Votos 2022: %{customdata[0]:,}",
-            "Projeção 2026: %{customdata[1]:,}",
-            "Crescimento (Absoluto): %{customdata[2]:,}",
-            "Crescimento (%): %{customdata[3]:.2f}%",
-        ])
-    )
+    fig_map.update_traces(hovertemplate="<br>".join([
+        "<b>%{hovertext}</b>",
+        "Cabo Eleitoral: %{customdata[4]}",
+        "Votos 2022: %{customdata[0]:,}",
+        "Projeção 2026: %{customdata[1]:,}",
+        "Crescimento (Absoluto): %{customdata[2]:,}",
+        "Crescimento (%): %{customdata[3]:.2f}%",
+    ]))
     fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     st.plotly_chart(fig_map, use_container_width=True)
 st.divider()
@@ -136,10 +136,8 @@ st.subheader("Análise Detalhada por Município")
 filtro_tabela_cabos = st.checkbox("Mostrar na tabela apenas municípios com Cabo Eleitoral")
 df_tabela = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')] if filtro_tabela_cabos else df
 df_tabela_display = df_tabela.drop(columns=['Municipio_ID'], errors='ignore')
-
 def estilo_crescimento(s):
     return ['color: green; font-weight: bold;' if v > 0.01 else 'color: red;' if v < -0.01 else '' for v in s]
-
 st.dataframe(
     df_tabela_display.style.apply(estilo_crescimento, subset=['Crescimento_Percentual']).format(formatter="{:,.0f}", na_rep='-').format({'Crescimento_Percentual': '{:.2f}%'}),
     use_container_width=True,
