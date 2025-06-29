@@ -11,6 +11,17 @@ st.set_page_config(
     layout="wide",
 )
 
+# <<< MELHORIA FINAL: Ocultar elementos da interface do Streamlit >>>
+# Este bloco de CSS irá esconder o menu, o rodapé e o cabeçalho do Streamlit
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # --- Funções de Apoio ---
 def normalize_text(text):
     if not isinstance(text, str): return ''
@@ -18,6 +29,7 @@ def normalize_text(text):
 
 @st.cache_data
 def carregar_dados_projecao():
+    """Lê o arquivo Excel com os dados de projeção final."""
     arquivo_base = 'base_de_dados_eleitoral.xlsx'
     if not os.path.exists(arquivo_base):
         st.error(f"Arquivo '{arquivo_base}' não encontrado! Execute 'gerar_simulacao.py' primeiro.")
@@ -32,6 +44,7 @@ def carregar_dados_projecao():
 
 @st.cache_data
 def carregar_geojson():
+    """Baixa o GeoJSON e adiciona uma propriedade de ID normalizada."""
     url = "https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-33-mun.json"
     try:
         geojson_data = requests.get(url).json()
@@ -65,17 +78,12 @@ st.divider()
 
 # --- MAPA INTERATIVO ---
 st.subheader("Análise Geográfica da Projeção")
-
-# <<< MELHORIA 1: Adicionar o checkbox de filtro para o mapa >>>
 filtro_mapa_cabos = st.checkbox("Destacar no mapa apenas municípios com Cabo Eleitoral")
-df_mapa = df
-if filtro_mapa_cabos:
-    # Mostra apenas municípios com cabo eleitoral para o mapa de cores
-    df_mapa = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')]
+df_mapa = df[df['Cabo_Eleitoral'].notna() & (df['Cabo_Eleitoral'] != '')] if filtro_mapa_cabos else df
 
 if geojson:
     fig_map = px.choropleth_mapbox(
-        df_mapa, # Usa o dataframe filtrado (ou não)
+        df_mapa,
         geojson=geojson,
         locations='Municipio_ID',
         featureidkey="properties.id",
@@ -85,7 +93,6 @@ if geojson:
         mapbox_style="carto-positron",
         zoom=7.5, center={"lat": -22.25, "lon": -42.70}, opacity=0.6,
         hover_name='Municipio',
-        # <<< MELHORIA 2: Adicionar o Cabo Eleitoral aos dados do hover >>>
         custom_data=['Votos_2022', 'Votos_2026', 'Crescimento_Votos', 'Crescimento_Percentual', 'Cabo_Eleitoral']
     )
     fig_map.update_traces(
